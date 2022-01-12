@@ -18,6 +18,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         FirebaseApp.configure()
         
+        Installations.installations().authTokenForcingRefresh(true) { result, error in
+            if let error = error {
+                print("ERROR: \(error.localizedDescription)")
+                return
+            }
+            guard let result = result else { return }
+        }
+        
         return true
     }
 

@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseRemoteConfig
+import FirebaseAnalytics
 
 class ViewController: UIViewController {
 
@@ -45,6 +46,7 @@ extension ViewController {
             }
             
             guard let self = self else { return }
+            
             if self.isNoticeHidden(remoteConfig){
                 let noticeVC = NoticeViewController(nibName: "NoticeViewController", bundle: nil)
                 
@@ -57,6 +59,8 @@ extension ViewController {
                 
                 noticeVC.noticeContents = (title: title, detail: detail, date: date)
                 self.present(noticeVC, animated: true, completion: nil)
+            } else {
+                self.showEventAlert()
             }
         }
     }
@@ -66,3 +70,29 @@ extension ViewController {
     }
 }
 
+//MARK: - A/B Testing
+extension ViewController {
+    func showEventAlert(){
+        guard let remoteConfig = remoteConfig else { return }
+        remoteConfig.fetch { [weak self] status , error  in
+            if status == .success{
+                remoteConfig.activate(completion: nil)
+            }else{
+                print("ERROR: Config not fetched")
+            }
+            
+            let message = remoteConfig["message"].stringValue ?? ""
+            let confirmAction = UIAlertAction(title: "확인하기", style: .default) { _ in
+                Analytics.logEvent("promotion_alert", parameters: nil)
+            }
+            let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
+            let alertController = UIAlertController(title: "깜짝 이벤트", message: message, preferredStyle: .alert)
+            
+            alertController.addAction(confirmAction)
+            alertController.addAction(cancelAction)
+            
+            self?.present(alertController, animated: true, completion: nil)
+        }
+        
+    }
+}
