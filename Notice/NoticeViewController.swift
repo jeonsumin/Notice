@@ -26,7 +26,7 @@ class NoticeViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         noticeView.layer.cornerRadius = 6
-        noticeView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        view.backgroundColor = UIColor.black.withAlphaComponent(0.5)
         
         //viewControler 에서 받아와 화면 구성
         guard let noticeContents = noticeContents else {
